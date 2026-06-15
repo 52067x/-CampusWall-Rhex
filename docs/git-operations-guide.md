@@ -5,7 +5,7 @@
 ## 当前仓库状态
 
 - 本地分支：`main`
-- 当前远程：`origin -> https://github.com/52067x/CampusWall-Rhex.git`
+- 当前远程：`origin -> https://github.com/52067x/-CampusWall-Rhex.git`
 - 初始提交：`a296ecb Initial commit`
 - 提交用户名：`52067x`
 - 提交邮箱：`52067x@gmail.com`
@@ -15,7 +15,7 @@
 如果 GitHub 上还没有仓库，先在 GitHub 创建一个空仓库，仓库名建议使用：
 
 ```bash
-CampusWall-Rhex
+-CampusWall-Rhex
 ```
 
 不要勾选自动创建 `README`、`.gitignore` 或 `LICENSE`，因为本地仓库已经有这些文件。
@@ -29,7 +29,7 @@ git remote -v
 如果地址不对，替换为自己的仓库地址：
 
 ```bash
-git remote set-url origin https://github.com/52067x/CampusWall-Rhex.git
+git remote set-url origin https://github.com/52067x/-CampusWall-Rhex.git
 ```
 
 推送本地 `main` 分支：

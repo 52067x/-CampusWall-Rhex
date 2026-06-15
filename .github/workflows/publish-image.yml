@@ -41,7 +41,7 @@ jobs:
             type=ref,event=tag
             type=sha
           labels: |
-            org.opencontainers.image.source=https://github.com/52067x/CampusWall-Rhex
+            org.opencontainers.image.source=https://github.com/52067x/-CampusWall-Rhex
 
       - name: Build and push image
         uses: docker/build-push-action@v6
