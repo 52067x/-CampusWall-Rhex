@@ -16,3 +16,4 @@ addons/.trash/
 !addons/*/dist/
 /uploads/
 /backups/
+/.runtime/

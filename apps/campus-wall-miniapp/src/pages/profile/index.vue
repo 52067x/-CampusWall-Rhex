@@ -37,7 +37,7 @@
     <view class="surface settings-card">
       <text class="section-title">连接</text>
       <view class="api-row">
-        <input v-model="apiBaseUrl" class="api-input" placeholder="http://localhost:3001" />
+        <input v-model="apiBaseUrl" class="api-input" placeholder="http://localhost:3000" />
         <button class="api-btn" @tap="saveApiBaseUrl">保存</button>
       </view>
     </view>

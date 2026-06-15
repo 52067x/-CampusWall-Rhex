@@ -1,4 +1,4 @@
-const DEFAULT_BASE_URL = "http://localhost:3001"
+const DEFAULT_BASE_URL = "http://localhost:3000"
 const COOKIE_KEY = "campus_wall_cookie"
 const BASE_URL_KEY = "campus_wall_api_base"
 
@@ -63,4 +63,3 @@ export function request(options) {
     })
   })
 }
-

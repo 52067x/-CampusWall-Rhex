@@ -33,7 +33,7 @@
       </view>
 
       <view class="api-row">
-        <input v-model="apiBaseUrl" class="api-input" placeholder="http://localhost:3001" />
+        <input v-model="apiBaseUrl" class="api-input" placeholder="http://localhost:3000" />
         <button class="api-btn" @tap="saveApiBaseUrl">保存</button>
       </view>
     </view>
@@ -243,4 +243,3 @@ async function submitWechat() {
   border: 0;
 }
 </style>
-
