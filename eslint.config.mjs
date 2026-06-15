@@ -15,6 +15,7 @@ export default defineConfig([
     "node_modules/**",
     "out/**",
     "dist/**",
+    "**/dist/**",
     "uploads/**",
     "backups/**",
     "addons/.runtime/**",

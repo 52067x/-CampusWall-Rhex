@@ -46,6 +46,18 @@ export function getApiBaseUrl() {
   return getBaseUrl()
 }
 
+export function getSessionCookie() {
+  return uni.getStorageSync(COOKIE_KEY)
+}
+
+export function resolveApiAssetUrl(value) {
+  const path = String(value || "").trim()
+  if (!path) return ""
+  if (/^(https?:|data:|blob:|file:)/i.test(path)) return path
+  if (path.startsWith("/")) return `${getBaseUrl()}${path}`
+  return path
+}
+
 export function clearSession() {
   uni.removeStorageSync(COOKIE_KEY)
 }
@@ -69,6 +81,7 @@ export function request(options) {
       method: options.method || "GET",
       data: options.data || undefined,
       header: headers,
+      withCredentials: true,
       success(response) {
         const nextCookie = readSetCookie(response.header)
         if (nextCookie) {

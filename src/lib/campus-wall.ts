@@ -2,6 +2,7 @@ import { prisma } from "@/db/client"
 import { apiError } from "@/lib/api-route"
 
 const PUBLIC_POST_STATUSES = ["NORMAL"] as const
+const MARKDOWN_IMAGE_PATTERN = /!\[[^\]]*]\(([^)\s]+)(?:\s+"[^"]*")?\)/g
 
 export function normalizeWallPage(searchParams: URLSearchParams) {
   const page = Number(searchParams.get("page") ?? "1")
@@ -42,6 +43,29 @@ function readPlainContent(value: string) {
   return value
 }
 
+function extractMarkdownImageUrls(value: string) {
+  const urls: string[] = []
+  const seen = new Set<string>()
+
+  for (const match of value.matchAll(MARKDOWN_IMAGE_PATTERN)) {
+    const url = String(match[1] || "").trim()
+    if (!url || seen.has(url)) continue
+    if (!url.startsWith("/uploads/") && !/^https?:\/\//i.test(url)) continue
+    seen.add(url)
+    urls.push(url)
+  }
+
+  return urls
+}
+
+function stripMarkdownImages(value: string) {
+  return value
+    .replace(MARKDOWN_IMAGE_PATTERN, "")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+}
+
 export function mapWallPost(post: {
   id: string
   slug: string
@@ -66,7 +90,10 @@ export function mapWallPost(post: {
     level?: number | null
   }
 }) {
-  const content = readPlainContent(post.content)
+  const rawContent = readPlainContent(post.content)
+  const images = extractMarkdownImageUrls(rawContent)
+  const content = stripMarkdownImages(rawContent)
+  const summary = stripMarkdownImages(post.summary || content.slice(0, 120)) || (images.length > 0 ? "图片动态" : "")
   const author = post.isAnonymous
     ? { username: "anonymous", nickname: "匿名同学", avatar: null, level: 1 }
     : mapWallUser(post.author)
@@ -75,8 +102,9 @@ export function mapWallPost(post: {
     id: post.id,
     slug: post.slug,
     title: post.title,
-    summary: post.summary || content.slice(0, 120),
+    summary,
     content,
+    images,
     isAnonymous: post.isAnonymous,
     board: post.board,
     author,
@@ -266,15 +294,19 @@ export async function getWallPostDetail(postId: string) {
 
   return {
     post: mapWallPost(post),
-    comments: post.comments.map((comment) => ({
-      id: comment.id,
-      content: readPlainContent(comment.content),
-      isAnonymous: comment.useAnonymousIdentity,
-      author: comment.useAnonymousIdentity
-        ? { username: "anonymous", nickname: "匿名同学", avatar: null, level: 1 }
-        : mapWallUser(comment.user),
-      likeCount: comment.likeCount,
-      createdAt: comment.createdAt.toISOString(),
-    })),
+    comments: post.comments.map((comment) => {
+      const rawContent = readPlainContent(comment.content)
+      return {
+        id: comment.id,
+        content: stripMarkdownImages(rawContent),
+        images: extractMarkdownImageUrls(rawContent),
+        isAnonymous: comment.useAnonymousIdentity,
+        author: comment.useAnonymousIdentity
+          ? { username: "anonymous", nickname: "匿名同学", avatar: null, level: 1 }
+          : mapWallUser(comment.user),
+        likeCount: comment.likeCount,
+        createdAt: comment.createdAt.toISOString(),
+      }
+    }),
   }
 }

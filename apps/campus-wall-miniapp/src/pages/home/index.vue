@@ -1,17 +1,17 @@
 <template>
   <view class="page home-page">
-    <view class="topbar">
-      <view>
+    <view class="topbar" style="display: flex;justify-content: space-between; width: 100%;">
+      <view >
         <text class="brand">校园墙</text>
         <text class="sub muted">Campus Wall</text>
       </view>
       <button class="quick-btn" @tap="goPublish">发布</button>
     </view>
 
-    <scroll-view scroll-x class="board-tabs" :show-scrollbar="false">
-      <view class="tabs-inner">
-        <text :class="['chip', !activeBoard ? 'active' : '']" @tap="switchBoard('')">全部</text>
-        <text
+    <scroll-view scroll-x class="board-tabs" :show-scrollbar="false" >
+      <view class="tabs-inner" style="width: 1000rpx;">
+        <text :class="['chip', !activeBoard ? 'active' : '']" style="width: 50rpx;" @tap="switchBoard('')">全部</text>
+        <text style=""
           v-for="board in boards"
           :key="board.slug"
           :class="['chip', activeBoard === board.slug ? 'active' : '']"
@@ -48,6 +48,16 @@
         </view>
         <text class="title">{{ post.title }}</text>
         <text class="summary">{{ post.summary }}</text>
+        <view v-if="post.images && post.images.length" class="image-grid">
+          <image
+            v-for="(image, index) in post.images.slice(0, 3)"
+            :key="image"
+            class="post-image"
+            :src="imageSrc(image)"
+            mode="aspectFill"
+            @tap.stop="previewPostImages(post.images, index)"
+          />
+        </view>
         <view class="metrics muted">
           <text>{{ post.metrics.comments }} 评论</text>
           <text>{{ post.metrics.views }} 浏览</text>
@@ -66,6 +76,7 @@
 import { ref } from "vue"
 import { onLoad, onPullDownRefresh, onReachBottom, onShow } from "@dcloudio/uni-app"
 import { getBoards, getPosts } from "../../api/wall"
+import { resolveApiAssetUrl } from "../../api/request"
 
 const boards = ref([])
 const posts = ref([])
@@ -89,6 +100,17 @@ function formatTime(value) {
   const hours = Math.floor(minutes / 60)
   if (hours < 24) return `${hours}小时前`
   return `${date.getMonth() + 1}-${date.getDate()}`
+}
+
+function imageSrc(urlPath) {
+  return resolveApiAssetUrl(urlPath)
+}
+
+function previewPostImages(images, index) {
+  uni.previewImage({
+    current: index,
+    urls: images.map((image) => imageSrc(image)),
+  })
 }
 
 async function loadBoards() {
@@ -142,8 +164,10 @@ onLoad(async () => {
 })
 
 onShow(() => {
-  if (!uni.getStorageSync("campus_wall_cookie")) {
-    return
+  if (uni.getStorageSync("campus_wall_posts_dirty")) {
+    uni.removeStorageSync("campus_wall_posts_dirty")
+    hasMore.value = true
+    void loadPosts(true)
   }
 })
 
@@ -297,6 +321,20 @@ onReachBottom(() => {
   line-height: 1.58;
 }
 
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10rpx;
+  margin-top: 16rpx;
+}
+
+.post-image {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12rpx;
+  background: #eef2ef;
+}
+
 .metrics {
   display: flex;
   gap: 24rpx;
@@ -317,4 +355,3 @@ onReachBottom(() => {
   font-size: 24rpx;
 }
 </style>
-

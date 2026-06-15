@@ -17,6 +17,17 @@
       <input v-model="title" class="input" maxlength="80" placeholder="标题" />
       <textarea v-model="content" class="textarea" maxlength="5000" placeholder="正文" />
 
+      <view v-if="images.length" class="image-grid">
+        <view v-for="(image, index) in images" :key="image.urlPath" class="image-item">
+          <image class="picked-image" :src="imageSrc(image.urlPath)" mode="aspectFill" @tap="previewImage(index)" />
+          <text class="remove-image" @tap.stop="removeImage(index)">×</text>
+        </view>
+      </view>
+
+      <button class="image-btn" :disabled="uploadingImages || images.length >= 9" @tap="chooseImages">
+        {{ uploadingImages ? "上传中..." : images.length >= 9 ? "最多 9 张" : "添加图片" }}
+      </button>
+
       <view v-if="moderation" class="moderation-box">
         <view class="between">
           <text class="moderation-title">审核结果</text>
@@ -36,13 +47,17 @@
 import { computed, ref } from "vue"
 import { onShow } from "@dcloudio/uni-app"
 import { checkContent, createPost, getBoards } from "../../api/wall"
+import { resolveApiAssetUrl } from "../../api/request"
+import { uploadImage } from "../../api/upload"
 
 const boards = ref([])
 const boardIndex = ref(0)
 const title = ref("")
 const content = ref("")
+const images = ref([])
 const isAnonymous = ref(false)
 const submitting = ref(false)
+const uploadingImages = ref(false)
 const moderation = ref(null)
 
 const boardNames = computed(() => boards.value.map((item) => item.name))
@@ -67,6 +82,52 @@ function onBoardChange(event) {
   boardIndex.value = Number(event.detail.value || 0)
 }
 
+function imageSrc(urlPath) {
+  return resolveApiAssetUrl(urlPath)
+}
+
+function buildContentWithImages() {
+  const text = content.value.trim()
+  const imageMarkdown = images.value.map((image) => `![](${image.urlPath})`).join("\n")
+  return [text, imageMarkdown].filter(Boolean).join("\n\n")
+}
+
+function chooseImages() {
+  if (uploadingImages.value || images.value.length >= 9) return
+
+  uni.chooseImage({
+    count: Math.max(1, 9 - images.value.length),
+    sizeType: ["compressed"],
+    sourceType: ["album", "camera"],
+    async success(result) {
+      const paths = result.tempFilePaths || []
+      if (!paths.length) return
+      uploadingImages.value = true
+      try {
+        for (const filePath of paths) {
+          const uploaded = await uploadImage(filePath, "posts")
+          if (uploaded?.urlPath) {
+            images.value.push({ urlPath: uploaded.urlPath })
+          }
+        }
+      } finally {
+        uploadingImages.value = false
+      }
+    },
+  })
+}
+
+function removeImage(index) {
+  images.value.splice(index, 1)
+}
+
+function previewImage(index) {
+  uni.previewImage({
+    current: index,
+    urls: images.value.map((image) => imageSrc(image.urlPath)),
+  })
+}
+
 function validate() {
   if (!activeBoard.value) {
     uni.showToast({ title: "请选择频道", icon: "none" })
@@ -76,7 +137,7 @@ function validate() {
     uni.showToast({ title: "标题太短", icon: "none" })
     return false
   }
-  if (content.value.trim().length < 2) {
+  if (content.value.trim().length < 2 && images.value.length === 0) {
     uni.showToast({ title: "正文太短", icon: "none" })
     return false
   }
@@ -85,12 +146,13 @@ function validate() {
 
 async function submit() {
   if (!validate() || submitting.value) return
+  const finalContent = buildContentWithImages()
   submitting.value = true
   try {
     moderation.value = await checkContent({
       targetType: "post",
       title: title.value,
-      content: content.value,
+      content: finalContent,
     })
     if (moderation.value.decision === "REJECT") {
       uni.showToast({ title: "内容未通过审核", icon: "none" })
@@ -98,7 +160,7 @@ async function submit() {
     }
     const result = await createPost({
       title: title.value,
-      content: content.value,
+      content: finalContent,
       boardSlug: activeBoard.value.slug,
       isAnonymous: isAnonymous.value,
       postType: "NORMAL",
@@ -106,8 +168,10 @@ async function submit() {
     uni.showToast({ title: result.reviewRequired ? "已提交审核" : "发布成功", icon: "success" })
     title.value = ""
     content.value = ""
+    images.value = []
     isAnonymous.value = false
     moderation.value = null
+    uni.setStorageSync("campus_wall_posts_dirty", "1")
     setTimeout(() => uni.switchTab({ url: "/pages/home/index" }), 500)
   } catch (error) {
     if (String(error?.message || "").includes("登录")) {
@@ -164,6 +228,54 @@ onShow(() => {
   min-height: 360rpx;
 }
 
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.image-item {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 12rpx;
+  background: #eef2ef;
+}
+
+.picked-image {
+  width: 100%;
+  height: 100%;
+}
+
+.remove-image {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 38rpx;
+  height: 38rpx;
+  border-radius: 999rpx;
+  background: rgba(23, 32, 28, 0.74);
+  color: #fff;
+  font-size: 28rpx;
+  line-height: 36rpx;
+  text-align: center;
+}
+
+.image-btn {
+  height: 70rpx;
+  margin-top: 18rpx;
+  border-radius: 12rpx;
+  background: #eef5f1;
+  color: #0f766e;
+  font-size: 26rpx;
+  line-height: 70rpx;
+}
+
+.image-btn::after {
+  border: 0;
+}
+
 .moderation-box {
   margin-top: 18rpx;
   padding: 20rpx;
@@ -205,4 +317,3 @@ onShow(() => {
   margin-top: 28rpx;
 }
 </style>
-
