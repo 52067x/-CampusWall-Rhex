@@ -1,9 +1,27 @@
-const DEFAULT_BASE_URL = "http://localhost:3000"
+const LOCAL_BACKEND_URL = "http://localhost:3000"
+let DEFAULT_BASE_URL = LOCAL_BACKEND_URL
+
+// #ifdef H5
+DEFAULT_BASE_URL = ""
+// #endif
+
 const COOKIE_KEY = "campus_wall_cookie"
 const BASE_URL_KEY = "campus_wall_api_base"
 
+function normalizeBaseUrl(value) {
+  return String(value || "").trim().replace(/\/+$/, "")
+}
+
 function getBaseUrl() {
-  return (uni.getStorageSync(BASE_URL_KEY) || DEFAULT_BASE_URL).replace(/\/+$/, "")
+  const stored = normalizeBaseUrl(uni.getStorageSync(BASE_URL_KEY))
+
+  // #ifdef H5
+  if (stored === LOCAL_BACKEND_URL || stored === "http://127.0.0.1:3000") {
+    return DEFAULT_BASE_URL
+  }
+  // #endif
+
+  return stored || DEFAULT_BASE_URL
 }
 
 function readSetCookie(header) {
@@ -15,7 +33,13 @@ function readSetCookie(header) {
 }
 
 export function setApiBaseUrl(value) {
-  uni.setStorageSync(BASE_URL_KEY, String(value || "").trim() || DEFAULT_BASE_URL)
+  const next = normalizeBaseUrl(value)
+  if (next) {
+    uni.setStorageSync(BASE_URL_KEY, next)
+    return
+  }
+
+  uni.removeStorageSync(BASE_URL_KEY)
 }
 
 export function getApiBaseUrl() {
@@ -30,9 +54,14 @@ export function request(options) {
   const cookie = uni.getStorageSync(COOKIE_KEY)
   const headers = {
     "Content-Type": "application/json",
-    ...(cookie ? { Cookie: cookie } : {}),
     ...(options.header || {}),
   }
+
+  // #ifndef H5
+  if (cookie) {
+    headers.Cookie = cookie
+  }
+  // #endif
 
   return new Promise((resolve, reject) => {
     uni.request({

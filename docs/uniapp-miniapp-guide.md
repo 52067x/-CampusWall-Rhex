@@ -8,10 +8,11 @@ apps\campus-wall-miniapp
 
 It talks to the Rhex web/API server through `apps\campus-wall-miniapp\src\api\request.js`.
 
-Default local API URL:
+Default local API behavior:
 
 ```text
-http://localhost:3000
+H5 preview: same-origin /api proxy from http://localhost:3001 to http://127.0.0.1:3000
+WeChat mini program: http://localhost:3000
 ```
 
 Backend and mini program preview ports are separate:
@@ -81,6 +82,8 @@ Open:
 ```text
 http://localhost:3001
 ```
+
+In H5 preview, leave the API URL field empty unless you need to test another backend. Empty means requests use `/api/...` on the H5 dev server, and Vite proxies them to the backend on `127.0.0.1:3000`. This avoids browser CORS and cookie header issues.
 
 If `3001` is already occupied, Vite will automatically use the next available port, for example:
 
