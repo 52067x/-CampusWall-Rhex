@@ -16,7 +16,7 @@ export interface RunAiTaskInput {
   provider: AiProvider
   messages: AiChatMessage[]
   options: AiChatOptions
-  /** 用于后续 rate-limit / usage 记账（本步占位，不实现） */
+  /** 用于按业务能力隔离每日调用限额。 */
   appKey: string
 }
 
@@ -27,12 +27,9 @@ export interface RunAiTaskOutput {
 }
 
 /**
- * 统一任务编排外壳（最小版）。
- * TODO(step 9): rate-limit 检查 + usage 增量记账
- * TODO(step X): 基于 kind 做 prompt/sanitizer 分派
+ * 统一任务编排外壳：在调用 provider 前执行公共限额检查，并透传 token usage。
  */
 export async function runAiTask(input: RunAiTaskInput): Promise<RunAiTaskOutput> {
-  // step 9: 前置日调用上限检查；超限抛 AiRateLimitError 由调用方短路重试
   const { dailyMax } = await getRateLimitConfig()
   await checkAndIncrementDaily(input.appKey, dailyMax)
   void input.kind
