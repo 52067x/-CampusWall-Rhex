@@ -141,8 +141,9 @@ function runPrismaScript<T>(script: string) {
 
 function inspectDatabaseState(): DatabaseState {
   const inspectionResult = runPrismaScript<DatabaseState>(`
-    const { PrismaClient, UserRole } = await import("@prisma/client");
-    const prisma = new PrismaClient();
+    const { UserRole } = await import("@prisma/client");
+    const { createPrismaClient } = await import("./src/db/prisma-client");
+    const prisma = createPrismaClient();
     try {
       const [siteSettingsCount, zoneCount, boardCount, adminCount, addonRegistryCount, addonConfigCount] = await Promise.all([
         prisma.siteSetting.count(),

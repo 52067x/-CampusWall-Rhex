@@ -259,16 +259,15 @@ async function checkPrismaEngine(): Promise<CheckResult> {
     }
   }
 
-  const isWindowsArm64 = process.platform === "win32" && process.arch === "arm64"
-  const { PrismaClient } = await import("@prisma/client")
-  const prisma = new PrismaClient({ log: [] })
+  const { createPrismaClient } = await import("../src/db/prisma-client")
+  const prisma = createPrismaClient({ log: [] })
 
   try {
-    await prisma.$connect()
+    await prisma.$queryRaw`SELECT 1`
     return {
       name: "Prisma engine",
       status: "pass",
-      message: "Prisma Client loaded and connected successfully.",
+      message: "Prisma Client loaded and executed a test query successfully.",
     }
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error)
@@ -282,12 +281,8 @@ async function checkPrismaEngine(): Promise<CheckResult> {
       return {
         name: "Prisma engine",
         status: "fail",
-        message: isWindowsArm64
-          ? "Prisma native engine is not compatible with Windows ARM64 Node.js in this checkout."
-          : "Prisma native engine is not compatible with this machine.",
-        hint: isWindowsArm64
-          ? "Install/use x64 Node.js on Windows ARM, or run the app through Docker/another x64 deployment environment."
-          : "Run `corepack pnpm run prisma:generate`. If it still fails, reinstall dependencies on this machine.",
+        message: "Prisma engine is not compatible with this machine.",
+        hint: "Run `corepack pnpm run prisma:generate`. If it still fails, reinstall dependencies on this machine.",
       }
     }
 

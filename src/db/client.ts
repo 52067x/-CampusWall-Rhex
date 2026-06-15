@@ -1,12 +1,12 @@
-import { PrismaClient } from "@prisma/client"
+import { createPrismaClient } from "@/db/prisma-client"
 
 type GlobalPrismaState = {
-  prisma?: PrismaClient
+  prisma?: ReturnType<typeof createPrismaClient>
 }
 
 const globalForPrisma = globalThis as typeof globalThis & GlobalPrismaState
 
-const prismaClient = globalForPrisma.prisma ?? new PrismaClient({
+const prismaClient = globalForPrisma.prisma ?? createPrismaClient({
   log: ["error"],
 })
 

@@ -3,15 +3,15 @@ import {
   BadgeRuleOperator,
   BadgeRuleType,
   BoardStatus,
-  PrismaClient,
   UserRole,
   UserStatus,
 } from "@prisma/client"
 import { hashSync } from "bcryptjs"
 
+import { createPrismaClient } from "../src/db/prisma-client"
 import { getBuiltinCustomPageSeeds } from "../src/lib/builtin-custom-pages"
 
-const prisma = new PrismaClient()
+const prisma = createPrismaClient()
 
 const APP_VERSION = "campus-wall-1.0.0"
 const DEFAULT_ADMIN_USERNAME = process.env.SEED_ADMIN_USERNAME?.trim() || "admin"
