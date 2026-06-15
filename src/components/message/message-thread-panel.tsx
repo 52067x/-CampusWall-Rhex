@@ -332,7 +332,7 @@ function MessageThreadPanelContent({
     }
 
     if (usingDemoData) {
-      setError("当前会话尚未完成数据库接入")
+      setError("当前会话不可写入，请刷新后重试")
       return
     }
 
@@ -400,7 +400,7 @@ function MessageThreadPanelContent({
     }
 
     if (usingDemoData) {
-      setError("当前会话尚未完成数据库接入")
+      setError("当前会话不可写入，请刷新后重试")
       return
     }
 
@@ -564,7 +564,7 @@ function MessageThreadPanelContent({
       </div>
 
       <div className="border-t border-border px-4 py-3 sm:px-5 sm:py-3.5 max-sm:pb-[calc(env(safe-area-inset-bottom)+12px)]">
-        {usingDemoData ? <p className="mb-3 rounded-[18px] bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:bg-amber-500/10 dark:text-amber-100">当前会话尚未完成数据库接入。</p> : null}
+        {usingDemoData ? <p className="mb-3 rounded-[18px] bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:bg-amber-500/10 dark:text-amber-100">当前会话暂时不可写入，请刷新后重试。</p> : null}
         {error ? <p className="mb-3 rounded-[18px] bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:bg-rose-500/10 dark:text-rose-200">{error}</p> : null}
         {assetUploadPending ? <p className="mb-3 rounded-[18px] bg-secondary px-4 py-3 text-sm text-muted-foreground">{assetUploadLabel}</p> : null}
         <div className="rounded-xl border border-border bg-background px-4 py-3 max-sm:rounded-xl">
