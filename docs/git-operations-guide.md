@@ -5,9 +5,9 @@
 ## 当前仓库状态
 
 - 本地分支：`main`
-- 当前远程：`origin -> https://github.com/52078x/CampusWall-Rhex.git`
+- 当前远程：`origin -> https://github.com/52067x/CampusWall-Rhex.git`
 - 初始提交：`a296ecb Initial commit`
-- 提交用户名：`52078x`
+- 提交用户名：`52067x`
 - 提交邮箱：`52067x@gmail.com`
 
 ## 首次上传到 GitHub
@@ -29,7 +29,7 @@ git remote -v
 如果地址不对，替换为自己的仓库地址：
 
 ```bash
-git remote set-url origin https://github.com/52078x/CampusWall-Rhex.git
+git remote set-url origin https://github.com/52067x/CampusWall-Rhex.git
 ```
 
 推送本地 `main` 分支：

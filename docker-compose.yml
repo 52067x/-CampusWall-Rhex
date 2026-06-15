@@ -5,7 +5,7 @@ x-app-environment: &app-environment
   REDIS_DB: ${REDIS_DB:-}
 
 x-app-service: &app-service
-  image: ghcr.io/52078x/campuswall-rhex:latest
+  image: ghcr.io/52067x/campuswall-rhex:latest
   pull_policy: always
   init: true
   env_file:

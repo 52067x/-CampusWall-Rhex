@@ -163,7 +163,7 @@ export async function SiteFooter() {
               <div className="flex items-center justify-center gap-2 sm:justify-end">
   
                 <Link
-                  href="https://github.com/52078x/CampusWall-Rhex"
+                  href="https://github.com/52067x/CampusWall-Rhex"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Rhex GitHub"

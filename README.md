@@ -183,7 +183,7 @@ REDIS_DB="2"
 ### 首次安装
 
 ```bash
-git clone https://github.com/52078x/CampusWall-Rhex.git
+git clone https://github.com/52067x/CampusWall-Rhex.git
 cd CampusWall-Rhex
 cp .env.example .env
 ```
@@ -218,7 +218,7 @@ tar -czf backups/rhex-files-$(date +%Y%m%d-%H%M%S).tar.gz uploads addons .env do
 ### 首次启动
 
 ```bash
-git clone https://github.com/52078x/CampusWall-Rhex.git
+git clone https://github.com/52067x/CampusWall-Rhex.git
 cd CampusWall-Rhex
 pnpm install
 cp .env.example .env

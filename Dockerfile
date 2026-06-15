@@ -40,7 +40,7 @@ ENV NODE_ENV=production
 
 WORKDIR /app
 
-LABEL org.opencontainers.image.source="https://github.com/52078x/CampusWall-Rhex"
+LABEL org.opencontainers.image.source="https://github.com/52067x/CampusWall-Rhex"
 
 RUN mkdir -p uploads addons
 

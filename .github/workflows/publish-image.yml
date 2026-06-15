@@ -35,13 +35,13 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/52078x/campuswall-rhex
+          images: ghcr.io/52067x/campuswall-rhex
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=tag
             type=sha
           labels: |
-            org.opencontainers.image.source=https://github.com/52078x/CampusWall-Rhex
+            org.opencontainers.image.source=https://github.com/52067x/CampusWall-Rhex
 
       - name: Build and push image
         uses: docker/build-push-action@v6
