@@ -140,6 +140,22 @@ corepack pnpm run lint
 
 当前项目没有 `test/*.test.ts` 测试文件，因此 `pnpm test` 暂时没有可执行测试集。
 
+## GitHub Actions
+
+仓库包含两个 workflow：
+
+- `.github/workflows/ci.yml`：每次推送到 `main` 或创建 PR 时运行依赖安装、Prisma Client 生成、lint 和生产构建。
+- `.github/workflows/publish-image.yml`：推送到 `main` 或打 `v*` tag 时构建并发布 Docker 镜像到 `ghcr.io/52067x/campuswall-rhex`。
+
+如果 CI 失败，优先在本地复现：
+
+```bash
+corepack pnpm install --frozen-lockfile
+corepack pnpm run prisma:generate
+corepack pnpm run lint
+corepack pnpm run build
+```
+
 ## 常见问题
 
 ### Repository not found
